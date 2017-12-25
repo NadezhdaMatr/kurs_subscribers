@@ -10,9 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
     database = QSqlDatabase::addDatabase("QSQLITE");
     database.setDatabaseName("mydb.db3");
     query = new QSqlQuery(database);
-    if (database.open())
+    if (database.open())    //Пробуем открыть БД
     {
-        if(!database.tables().contains("subscribers"))
+        if(!database.tables().contains("subscribers"))  //Если основной таблицы нет, то создаем ее и заполняем данными
         {
             query->clear();
             query->exec("CREATE TABLE subscribers("
@@ -50,10 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    delete model;
+    delete query;
     delete ui;
 }
 
-void MainWindow::on_addButton_clicked()
+void MainWindow::on_addButton_clicked() //Добавление записи
 {
     query->prepare("INSERT INTO subscribers (surname, duration, cost) "
                        "VALUES (:surname, :dur, :price)");
@@ -65,7 +67,7 @@ void MainWindow::on_addButton_clicked()
     model->select();
 }
 
-void MainWindow::on_deleteButton_clicked()
+void MainWindow::on_deleteButton_clicked()  //Удаление записи
 {
     query->prepare("DELETE FROM subscribers WHERE id=:ID");
     query->bindValue(":ID", ui->idEdit->text());
@@ -73,17 +75,20 @@ void MainWindow::on_deleteButton_clicked()
     model->select();
 }
 
-void MainWindow::on_selectAllButton_clicked()
+void MainWindow::on_selectAllButton_clicked()   //Фильтр: вывести все
 {
-
+    model->setFilter("");
+    model->select();
 }
 
-void MainWindow::on_selectAllPriceButton_clicked()
+void MainWindow::on_selectAllPriceButton_clicked() //Фильтр: Если стоимость всех разговоров больше 50
 {
-
+    model->setFilter("cost*duration > 50.0");
+    model->select();
 }
 
-void MainWindow::on_selectPriceButton_clicked()
+void MainWindow::on_selectPriceButton_clicked() //Фильтр: Если цена минуты разговора больше 1
 {
-
+    model->setFilter("cost > 1.0");
+    model->select();
 }
