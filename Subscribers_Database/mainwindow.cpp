@@ -55,12 +55,22 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_addButton_clicked()
 {
-
+    query->prepare("INSERT INTO subscribers (surname, duration, cost) "
+                       "VALUES (:surname, :dur, :price)");
+    query->bindValue(":surname", ui->surnameEdit->text());
+    query->bindValue(":dur", ui->durationEdit->text());
+    query->bindValue(":price", ui->priceEdit->text());
+    query->exec();
+    model->setFilter("");
+    model->select();
 }
 
 void MainWindow::on_deleteButton_clicked()
 {
-
+    query->prepare("DELETE FROM subscribers WHERE id=:ID");
+    query->bindValue(":ID", ui->idEdit->text());
+    query->exec();
+    model->select();
 }
 
 void MainWindow::on_selectAllButton_clicked()
